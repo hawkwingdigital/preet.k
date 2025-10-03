@@ -1,14 +1,21 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-    font-family: sans-serif;
-    margin: 0;
-    background-color: #050505;
-    color: #f4f1f1;
+    font-family: 'Inter', sans-serif;
+    background: #0b1220; /* dark background */
+    color: #ffffff;
+    line-height: 1.6;
 }
 
 header {
     background-color: rgb(0, 0, 0);
-    padding: 1rem;
-    border-bottom: 0.6px solid #fdfafa;
+    padding: 0.5rem;
+    border-bottom: 0.05px solid #fdfafa;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -26,6 +33,7 @@ nav {
       max-width: 200px;  /* adjust size */
       height: auto;
       margin-left: -50px;
+      margin-right: auto; /* Push nav links to the right */
     }
 
 .nav-links {
@@ -71,11 +79,11 @@ nav {
     }
 
     .hero h1 {
-        font-size: 2rem;
+        font-size: 2.5rem; /* Slightly larger for impact, but still mobile-friendly */
     }
 
     .hero p {
-        font-size: 1rem;
+        font-size: 0.9rem; /* A bit smaller to give the heading more space */
     }
 
     .cta-button {
@@ -91,12 +99,22 @@ nav {
         margin-bottom: 2rem;
     }
 
-    .services h2,
-    .cta-section h2,
-    .journey h2,
-    .testimonials h2 {
+    /* Reduce vertical padding on all major sections for mobile */
+    .hero, .services, .cta-section, .journey, .testimonials, .tools {
+        padding-top: 2.5rem;
+        padding-bottom: 2.5rem;
+    }
+
+    /* Reduce heading sizes on mobile */
+    .services h2, .cta-section h2, .journey h2, .testimonials h2 {
         font-size: 2rem;
     }
+
+    /* Make "Explore Tools We Use" smaller on mobile */
+    .banner .content h1 {
+        font-size: 3em; /* Significantly reduced for better mobile viewing */
+    }
+
 }
 
 nav a {
@@ -112,9 +130,11 @@ nav a:hover {
     text-underline-offset: 5px;
 }
 
+/* Hero Section */
 .hero {
     text-align: center;
     padding: 4rem 1rem;
+    padding: 100px 20px 60px;
 }
 
 .hero h1 {
@@ -122,10 +142,20 @@ nav a:hover {
     margin-bottom: 1rem;
     font-weight: bold;
     line-height: 1.5;
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  font-weight: 800;
 }
 
 .hero h1 span {
     display: block;
+}
+.hero p {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  color: #cbd5e1;
+  max-width: 650px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .stats {
@@ -168,50 +198,6 @@ nav a:hover {
     padding: 4rem 1rem;
     max-width: 1200px;
     margin: 0 auto;
-}
-
-/* Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  background: #0b1220; /* dark background */
-  color: #ffffff;
-  line-height: 1.6;
-}
-
-/* Page container */
-.container {
-  width: 90%;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 60px 0;
-}
-
-/* Hero Section */
-.hero {
-  text-align: center;
-  padding: 100px 20px 60px;
-}
-.hero h1 {
-  font-size: clamp(2.5rem, 6vw, 3.5rem);
-  font-weight: 800;
-}
-.hero p {
-  margin-top: 1rem;
-  font-size: 1.1rem;
-  color: #cbd5e1;
-  max-width: 650px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Services Grid */
-.services {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 2rem;
@@ -300,19 +286,6 @@ body {
   background: #f6f6f8;
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .hero h1 {
-    font-size: 2rem;
-  }
-  .hero p {
-    font-size: 1rem;
-  }
-  .cta h2 {
-    font-size: 1.5rem;
-  }
-}
-
 .cta-section {
     /* dual-color background */
       background: linear-gradient(90deg, #11172a, #571b85);
@@ -350,10 +323,10 @@ body {
 
 .banner .slider {
     position: absolute;
-    top: 20%;   /* ⬅️ change from 50% to 20% */
+    top: 10%;   /* ⬅️ change from 50% to 20% */
     left: 40%;
     transform: translate(50%, 50%);        /* ✅ center relative inside flex */
-    width: 200px;               /* smaller so fits screen */
+    width: 220px;               /* smaller so fits screen */
     height: 300px;
     transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
@@ -432,7 +405,7 @@ body {
 
 .tools {
     text-align: center;
-    padding: 4rem 1rem;
+    padding: 2rem 1rem;
 }
 
 .testimonial-carousel-container {
@@ -446,28 +419,53 @@ body {
 
 .testimonial-carousel-wrapper {
     overflow: hidden;
-    width: 100%;
-    max-width: 900px; /* Adjust as needed for desktop */
+    width: 100%; /* Let it be flexible */
+    max-width: 1000px; /* Give it more space to prevent clipping */
 }
 
 .testimonial-carousel {
     display: flex;
-    transition: transform 0.5s ease-in-out;
-    flex-wrap: wrap; /* Allow cards to wrap on desktop */
-    justify-content: center; /* Center cards on desktop */
+    flex-wrap: nowrap;
+    animation: scroll 30s linear infinite; /* New continuous scroll animation */
+}
+
+.testimonial-carousel-wrapper:hover .testimonial-carousel {
+    animation-play-state: paused;
 }
 
 .testimonial-card {
     flex: 0 0 300px; /* Fixed width for desktop cards */
     margin: 0 1rem 2rem 1rem; /* Add bottom margin for spacing on desktop */
     font-size: 1.1rem;
-    color: #0e0202;
-    box-sizing: border-box; /* Include padding in width calculation */
+    color: #000000;
+    box-sizing: border-box;
+    width: 300px; /* Explicit width */
 }
 
 /* Hide carousel buttons by default on desktop */
 .carousel-button {
-    display: none;
+    display: none; /* Hide buttons as they don't work with continuous scroll */
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10; 
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(calc(-332px * 5)); /* (Card Width + Margin) * Number of Original Cards */
+    }
 }
 
 /* Mobile-specific styles for testimonial carousel */
@@ -486,28 +484,12 @@ body {
     }
 
     .testimonial-card {
-        flex: 0 0 100%; /* Each card takes full width of the wrapper on mobile */
-        width: 100%;
-        margin: 0; /* Remove horizontal margin for sliding */
-        padding: 1rem; /* Add some padding inside the card */
+        flex: 0 0 280px; /* Set a smaller, fixed width for mobile */
+        width: 280px;
+        font-size: 1rem; /* Slightly smaller font for a more compact card */
     }
 
     /* Show carousel buttons on mobile */
-    .carousel-button {
-        display: block;
-        background-color: rgba(255, 255, 255, 0.2);
-        border: none;
-        color: white;
-        font-size: 2rem;
-        cursor: pointer;
-        padding: 0.5rem 1rem;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 10;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-    }
 
     .carousel-button:hover {
         background-color: rgba(255, 255, 255, 0.4);
@@ -519,20 +501,6 @@ body {
 
     .carousel-button.next {
         right: 10px;
-    }
-
-    /* Adjust button positioning for vertical layout on mobile */
-    .testimonial-carousel-container.mobile-layout .carousel-button.prev {
-        left: 50%;
-        transform: translateX(-50%) rotate(90deg);
-        top: 0;
-    }
-
-    .testimonial-carousel-container.mobile-layout .carousel-button.next {
-        right: 50%;
-        transform: translateX(50%) rotate(90deg);
-        bottom: 0;
-        top: auto;
     }
 }
 
@@ -551,7 +519,7 @@ body {
 }
 
 .about {
-  padding: 4rem 1rem;
+  padding: 2rem 1rem;
   max-width: 1200px;
   margin: 60px auto;           /* same spacing as journey */
   /* dual-color background */
@@ -823,4 +791,8 @@ body {
         opacity: 0;
         transform: translate(-50%, -50%) scale(6);
     }
+}
+
+.mobile-only {
+    display: none; /* We are making the carousel universal, so this isn't needed */
 }
