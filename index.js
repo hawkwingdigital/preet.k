@@ -100,60 +100,24 @@ const observer = new IntersectionObserver((entries) => {
 
 observer.observe(statsSection);
 
-// Testimonial carousel functionality (mobile only)
-function initializeTestimonialCarousel() {
-  const testimonialCarousel = document.getElementById('testimonialCarousel');
-  const prevTestimonialBtn = document.getElementById('prevTestimonial');
-  const nextTestimonialBtn = document.getElementById('nextTestimonial');
-  const testimonialCards = document.querySelectorAll('.testimonial-card');
-  let currentIndex = 0;
-
-  if (!testimonialCarousel || !prevTestimonialBtn || !nextTestimonialBtn || testimonialCards.length === 0) {
-    return; // Exit if elements are not found
-  }
-
-  function updateTestimonialCarousel() {
-    const cardWidth = testimonialCards[0].offsetWidth;
-    testimonialCarousel.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-  }
-
-  prevTestimonialBtn.addEventListener('click', () => {
-    currentIndex = (currentIndex > 0) ? currentIndex - 1 : testimonialCards.length - 1;
-    updateTestimonialCarousel();
-  });
-
-  nextTestimonialBtn.addEventListener('click', () => {
-    currentIndex = (currentIndex < testimonialCards.length - 1) ? currentIndex + 1 : 0;
-    updateTestimonialCarousel();
-  });
-
-  // Initialize carousel position
-  updateTestimonialCarousel();
-
-  // Add touch/swipe functionality for mobile
-  let touchStartX = 0;
-  let touchEndX = 0;
-
-  testimonialCarousel.addEventListener('touchstart', (e) => {
-    touchStartX = e.touches[0].clientX;
-  });
-
-  testimonialCarousel.addEventListener('touchmove', (e) => {
-    touchEndX = e.touches[0].clientX;
-  });
-
-  testimonialCarousel.addEventListener('touchend', () => {
-    if (touchEndX < touchStartX - 50) { // Swiped left
-      currentIndex = (currentIndex < testimonialCards.length - 1) ? currentIndex + 1 : 0;
+// Testimonial carousel functionality
+const initializeTestimonialCarousel = () => {
+    const carousel = document.getElementById("testimonialCarousel");
+    if (!carousel || carousel.dataset.initialized) {
+        return;
     }
-    if (touchEndX > touchStartX + 50) { // Swiped right
-      currentIndex = (currentIndex > 0) ? currentIndex - 1 : testimonialCards.length - 1;
-    }
-    updateTestimonialCarousel();
-  });
-}
 
-// Check if it's a mobile device (or screen width is small) before initializing
-if (window.matchMedia("(max-width: 768px)").matches) {
-  initializeTestimonialCarousel();
-}
+    const cards = carousel.querySelectorAll(".testimonial-card");
+    if (cards.length === 0) return;
+
+    // Duplicate all cards for a seamless CSS animation loop
+    cards.forEach((card) => {
+        const clone = card.cloneNode(true);
+        carousel.appendChild(clone);
+    });
+
+    // Mark as initialized to prevent re-running the duplication
+    carousel.dataset.initialized = "true";
+};
+
+initializeTestimonialCarousel();
