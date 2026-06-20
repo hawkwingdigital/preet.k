@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog – Hawk Wing Media</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --accent-1: #d946ef;
+            --accent-2: #38bdf8;
+            --card-bg: rgba(255,255,255,0.03);
+            --card-border: rgba(255,255,255,0.08);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ── FILTER TABS ── */
+        .filter-bar { display:flex; flex-wrap:wrap; justify-content:center; gap:0.6rem; }
+        .filter-btn {
+            padding: 0.45rem 1.2rem;
+            border-radius: 999px;
+            border: 1px solid var(--card-border);
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover { border-color: rgba(255,255,255,0.2); color: #fff; }
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            border-color: transparent;
+            color: #fff;
+        }
+
+        /* ── TAG BADGES ── */
+        .tag { display:inline-block; padding:0.2rem 0.7rem; border-radius:999px; font-size:0.72rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; }
+        .tag-ai       { background:rgba(217,70,239,0.15); color:#d946ef; }
+        .tag-seo      { background:rgba(56,189,248,0.15);  color:#38bdf8; }
+        .tag-social   { background:rgba(251,191,36,0.15);  color:#fbbf24; }
+        .tag-strategy { background:rgba(52,211,153,0.15);  color:#34d399; }
+        .tag-ppc      { background:rgba(248,113,113,0.15); color:#f87171; }
+        .tag-brand    { background:rgba(129,140,248,0.15); color:#818cf8; }
+
+        /* ── FEATURED POST ── */
+        .featured-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .featured-wrap:hover { transform: translateY(-5px); box-shadow: 0 24px 60px rgba(217,70,239,0.12); }
+        .featured-thumb {
+            min-height: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .featured-thumb .thumb-glow {
+            position:absolute; inset:0;
+            background: radial-gradient(ellipse at center, rgba(217,70,239,0.3), transparent 70%);
+        }
+        .featured-thumb .thumb-icon { position:relative; z-index:1; }
+        .featured-body { padding: 2.5rem; display:flex; flex-direction:column; justify-content:center; gap:1rem; }
+        .featured-body h2 { font-size:clamp(1.4rem,2.5vw,1.8rem); font-weight:800; line-height:1.25; letter-spacing:-0.02em; }
+        .featured-body p  { color:#94a3b8; font-size:0.95rem; line-height:1.75; }
+        .post-meta { display:flex; align-items:center; gap:1rem; color:#64748b; font-size:0.8rem; flex-wrap:wrap; }
+
+        .read-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.65rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            border-radius: 999px;
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            width: fit-content;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .read-btn:hover { opacity: 0.85; transform: translateX(3px); }
+
+        @media (max-width: 768px) {
+            .featured-wrap { grid-template-columns: 1fr; }
+            .featured-thumb { min-height: 200px; }
+        }
+
+        /* ── POST CARDS ── */
+        .post-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            cursor: pointer;
+        }
+        .post-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border-color: rgba(255,255,255,0.14);
+        }
+        .card-thumb {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-thumb .cg { position:absolute; inset:0; }
+        .card-thumb .ci { position:relative; z-index:1; }
+        .thumb-ai       { background: linear-gradient(135deg,#1e0a2e,#0d0d1a); }
+        .thumb-seo      { background: linear-gradient(135deg,#001e2e,#0a0a1a); }
+        .thumb-social   { background: linear-gradient(135deg,#1a1200,#0d0d1a); }
+        .thumb-strategy { background: linear-gradient(135deg,#001a10,#0a0d0a); }
+        .thumb-ppc      { background: linear-gradient(135deg,#1a0000,#0d0a0a); }
+        .thumb-brand    { background: linear-gradient(135deg,#0a0020,#0d0d1a); }
+        .thumb-ai .cg       { background: radial-gradient(ellipse at center,rgba(217,70,239,0.3),transparent 70%); }
+        .thumb-seo .cg      { background: radial-gradient(ellipse at center,rgba(56,189,248,0.3),transparent 70%); }
+        .thumb-social .cg   { background: radial-gradient(ellipse at center,rgba(251,191,36,0.3),transparent 70%); }
+        .thumb-strategy .cg { background: radial-gradient(ellipse at center,rgba(52,211,153,0.3),transparent 70%); }
+        .thumb-ppc .cg      { background: radial-gradient(ellipse at center,rgba(248,113,113,0.3),transparent 70%); }
+        .thumb-brand .cg    { background: radial-gradient(ellipse at center,rgba(129,140,248,0.3),transparent 70%); }
+
+        .card-body { padding:1.5rem; display:flex; flex-direction:column; gap:0.7rem; flex:1; }
+        .card-body h3 { font-size:1rem; font-weight:700; line-height:1.35; letter-spacing:-0.01em; }
+        .card-body p  { color:#94a3b8; font-size:0.85rem; line-height:1.65; flex:1; }
+        .card-footer { display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:#64748b; margin-top:0.5rem; }
+        .card-arrow { background: linear-gradient(135deg,var(--accent-1),var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; font-weight:800; }
+
+        /* ── NEWSLETTER ── */
+        .newsletter-wrap {
+            background: linear-gradient(135deg, rgba(217,70,239,0.08), rgba(56,189,248,0.08));
+            border: 1px solid rgba(217,70,239,0.2);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .nl-form { display:flex; gap:0.6rem; flex-wrap:wrap; justify-content:center; margin-top:1.5rem; }
+        .nl-form input {
+            flex:1; min-width:220px;
+            padding: 0.75rem 1.2rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .nl-form input:focus { border-color: var(--accent-1); }
+        .nl-form button {
+            padding: 0.75rem 1.8rem;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg,var(--accent-1),var(--accent-2));
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .nl-form button:hover { opacity: 0.85; }
+
+        /* ── SIDEBAR TOPICS ── */
+        .topic-pill {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            border: 1px solid var(--card-border);
+            color: #94a3b8;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 0.25rem;
+        }
+        .topic-pill:hover { border-color: var(--accent-1); color: var(--accent-1); }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="hawk.png" alt="Hawk Wing Media Logo">
+            </div>
+            <button class="hamburger" id="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- HERO -->
+        <section style="text-align:center;padding:5rem 1.5rem 3rem;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-4rem;left:50%;transform:translateX(-50%);width:500px;height:300px;background:radial-gradient(ellipse,rgba(217,70,239,0.15),transparent 70%);pointer-events:none;"></div>
+            <p style="font-size:0.78rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#64748b;margin-bottom:1rem;">Hawk Wing Media</p>
+            <h1 style="font-size:clamp(2.5rem,6vw,4.5rem);font-weight:800;line-height:1.1;letter-spacing:-0.03em;margin-bottom:1rem;">
+                Insights &amp; <span class="text-gradient">Strategies</span>
+            </h1>
+            <p style="color:#94a3b8;font-size:1.05rem;max-width:520px;margin:0 auto 2.5rem;line-height:1.7;">
+                Deep dives into digital marketing, AI automation, and growth tactics — straight from the Hawk Wing team.
+            </p>
+            <!-- Filter Tabs -->
+            <div class="filter-bar" id="filterBar">
+                <button class="filter-btn active" data-filter="all">All Posts</button>
+                <button class="filter-btn" data-filter="ai">AI &amp; Automation</button>
+                <button class="filter-btn" data-filter="seo">SEO</button>
+                <button class="filter-btn" data-filter="social">Social Media</button>
+                <button class="filter-btn" data-filter="ppc">PPC</button>
+                <button class="filter-btn" data-filter="strategy">Strategy</button>
+                <button class="filter-btn" data-filter="brand">Branding</button>
+            </div>
+        </section>
+
+        <!-- FEATURED POST -->
+        <section style="max-width:1100px;margin:0 auto;padding:0 1.5rem 3rem;" id="featuredSection">
+            <p style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;margin-bottom:1rem;">★ Featured Article</p>
+            <div class="featured-wrap" data-cat="ai">
+                <div class="featured-thumb thumb-ai">
+                    <div class="thumb-glow"></div>
+                    <div class="thumb-icon">🤖</div>
+                </div>
+                <div class="featured-body">
+                    <span class="tag tag-ai">AI &amp; Automation</span>
+                    <h2>How AI Automation Helped Our Clients Cut Lead Response Time by 80%</h2>
+                    <p>We deployed intelligent CRM workflows across three Bangalore-based startups. Here's the exact playbook — from chatbot triggers to automated follow-up sequences — and the numbers that followed.</p>
+                    <div class="post-meta">
+                        <span>✍️ Supreet</span>
+                        <span>📅 March 2025</span>
+                        <span>⏱ 8 min read</span>
+                    </div>
+                    <a href="#" class="read-btn">Read Article →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN CONTENT + SIDEBAR -->
+        <section style="max-width:1100px;margin:0 auto;padding:0 1.5rem 5rem;display:grid;grid-template-columns:1fr 300px;gap:3rem;">
+            <!-- POST GRID -->
+            <div>
+                <p style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;margin-bottom:1.5rem;">Latest Articles</p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;" id="postsGrid">
+
+                    <article class="post-card" data-cat="seo">
+                        <div class="card-thumb thumb-seo"><div class="cg"></div><span class="ci">🔍</span></div>
+                        <div class="card-body">
+                            <span class="tag tag-seo">SEO</span>
+                            <h3>The 2025 SEO Playbook for Indian E-Commerce Brands</h3>
+                            <p>Google's SGE is reshaping search. We break down what's working right now for D2C brands targeting Tier 1 and Tier 2 cities.</p>
+                            <div class="card-footer"><span>📅 Feb 2025 · 6 min</span><span class="card-arrow">→</span></div>
+                        </div>
+                    </article>
+
+                    <article class="post-card" data-cat="social">
+                        <div class="card-thumb thumb-social"><div class="cg"></div><span class="ci">📲</span></div>
+                        <div class="card-body">
+                            <span class="tag tag-social">Social Media</span>
+                            <h3>Why Reels Still Beat Everything Else on Instagram in 2025</h3>
+                            <p>We analysed 90 days of client data to show you exactly what hooks, lengths, and cadences are winning right now.</p>
+                            <div class="card-footer"><span>📅 Jan 2025 · 5 min</span><span class="card-arrow">→</span></div>
+                        </div>
+                    </article>
+
+                    <article class="post-card" data-cat="ppc">
+                        <div class="card-thumb thumb-ppc"><div class="cg"></div><span class="ci">💰</span></div>
+                        <div class="card-body">
+                            <span class="tag tag-ppc">PPC</span>
+                            <h3>Achieving 8× ROAS on Google Ads: A Full Campaign Breakdown</h3>
+                            <p>From keyword strategy to landing page CRO — how ₹1.5L ad spend turned into ₹12L revenue in 60 days.</p>
+                            <div class="card-footer"><span>📅 Dec 2024 · 7 min</span><span class="card-arrow">→</span></div>
+                        </div>
+                    </article>
+
+                    <article class="post-card" data-cat="strategy">
+                        <div class="card-thumb thumb-strategy"><div class="cg"></div><span class="ci">📈</span></div>
+                        <div class="card-body">
+                            <span class="tag tag-strategy">Strategy</span>
+                            <h3>How to Build a 90-Day Digital Growth Roadmap From Scratch</h3>
+                            <p>The exact framework we use with every new client — from market audit to OKRs. Download the free template inside.</p>
+                            <div class="card-footer"><span>📅 Nov 2024 · 9 min</span><span class="card-arrow">→</span></div>
+                        </div>
+                    </article>
+
+                    <article class="post-card" data-cat="ai">
+                        <div class="card-thumb thumb-ai"><div class="cg"></div><span class="ci">⚡</span></div>
+                        <div class="card-body">
+                            <span class="tag tag-ai">AI &amp; Automation</span>
+                            <h3>5 Zapier Workflows Every Small Business Should Set Up Today</h3>
+                            <p>These automations save our clients an average of 12 hours per week with zero ongoing cost after setup.</p>
+                            <div class="card-footer"><span>📅 Oct 2024 · 4 min</span><span class="card-arrow">→</span></div>
+                        </div>
+                    </article>
+
+                    <article class="post-card" data-cat="seo">
+                        <div class="card-thumb thumb-seo"><div class="cg"></div><span class="ci">📝</span></div>
+                        <div class="card-body">
+                            <span class="tag tag-seo">SEO</span>
+                            <h3>Content Clusters vs. Standalone Posts: What Actually Ranks in 2025</h3>
+                            <p>We ran a 6-month A/B test across two client blogs. The results challenged everything we thought we knew about topical authority.</p>
+                            <div class="card-footer"><span>📅 Sep 2024 · 6 min</span><span class="card-arrow">→</span></div>
+                        </div>
+                    </article>
+
+                    <article class="post-card" data-cat="brand">
+                        <div class="card-thumb thumb-brand"><div class="cg"></div><span class="ci">🎨</span></div>
+                        <div class="card-body">
+                            <span class="tag tag-brand">Branding</span>
+                            <h3>How We Cut Acquisition Cost by 60% With a Complete Brand Refresh</h3>
+                            <p>A case study on how aligning messaging, visual identity, and UX can dramatically improve paid campaign performance.</p>
+                            <div class="card-footer"><span>📅 Aug 2024 · 8 min</span><span class="card-arrow">→</span></div>
+                        </div>
+                    </article>
+
+                    <article class="post-card" data-cat="social">
+                        <div class="card-thumb thumb-social"><div class="cg"></div><span class="ci">🎬</span></div>
+                        <div class="card-body">
+                            <span class="tag tag-social">Social Media</span>
+                            <h3>LinkedIn for B2B Leads: Our 3-Month Experiment with Real Numbers</h3>
+                            <p>We tested 4 content formats — thought leadership, case studies, polls, and video — and tracked which one drove the most inbound enquiries.</p>
+                            <div class="card-footer"><span>📅 Jul 2024 · 7 min</span><span class="card-arrow">→</span></div>
+                        </div>
+                    </article>
+
+                    <article class="post-card" data-cat="ppc">
+                        <div class="card-thumb thumb-ppc"><div class="cg"></div><span class="ci">🎯</span></div>
+                        <div class="card-body">
+                            <span class="tag tag-ppc">PPC</span>
+                            <h3>Meta Ads in 2025: What's Changed and How to Adapt Fast</h3>
+                            <p>Advantage+ campaigns, AI creative testing, and Reels placements — here's what's actually moving the needle on Meta right now.</p>
+                            <div class="card-footer"><span>📅 Jun 2024 · 5 min</span><span class="card-arrow">→</span></div>
+                        </div>
+                    </article>
+
+                </div>
+
+                <!-- LOAD MORE -->
+                <div style="text-align:center;margin-top:2.5rem;" id="loadMoreWrap">
+                    <button id="loadMoreBtn" onclick="loadMore()" style="padding:0.75rem 2.5rem;border-radius:999px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#94a3b8;font-size:0.9rem;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='#d946ef';this.style.color='#d946ef';" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#94a3b8';">
+                        Load More Articles
+                    </button>
+                </div>
+            </div>
+
+            <!-- SIDEBAR -->
+            <aside style="position:sticky;top:80px;align-self:start;">
+                <!-- Search -->
+                <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+                    <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:1rem;">🔍 Search Articles</h4>
+                    <input type="text" id="searchInput" placeholder="Type to search..." oninput="searchPosts(this.value)" style="width:100%;padding:0.7rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;font-size:0.88rem;outline:none;">
+                </div>
+
+                <!-- Popular Topics -->
+                <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+                    <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:1rem;">🏷️ Topics</h4>
+                    <div>
+                        <span class="topic-pill" onclick="filterByTag('ai')">AI &amp; Automation</span>
+                        <span class="topic-pill" onclick="filterByTag('seo')">SEO</span>
+                        <span class="topic-pill" onclick="filterByTag('social')">Social Media</span>
+                        <span class="topic-pill" onclick="filterByTag('ppc')">PPC</span>
+                        <span class="topic-pill" onclick="filterByTag('strategy')">Strategy</span>
+                        <span class="topic-pill" onclick="filterByTag('brand')">Branding</span>
+                        <span class="topic-pill" onclick="filterByTag('all')">View All</span>
+                    </div>
+                </div>
+
+                <!-- Newsletter Mini -->
+                <div style="background:linear-gradient(135deg,rgba(217,70,239,0.1),rgba(56,189,248,0.08));border:1px solid rgba(217,70,239,0.2);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+                    <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.5rem;">📬 Newsletter</h4>
+                    <p style="color:#94a3b8;font-size:0.82rem;margin-bottom:1rem;line-height:1.6;">Get our best content, bi-weekly. No spam.</p>
+                    <input type="email" placeholder="your@email.com" id="sidebarEmail" style="width:100%;padding:0.65rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;font-size:0.85rem;outline:none;margin-bottom:0.6rem;">
+                    <button onclick="sidebarSubscribe()" style="width:100%;padding:0.65rem;border-radius:8px;border:none;background:linear-gradient(135deg,#d946ef,#38bdf8);color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;">Subscribe</button>
+                </div>
+
+                <!-- Popular Posts -->
+                <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:16px;padding:1.5rem;">
+                    <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:1rem;">🔥 Most Read</h4>
+                    <div style="display:flex;flex-direction:column;gap:1rem;">
+                        <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+                            <span style="font-size:1.4rem;">🤖</span>
+                            <div>
+                                <p style="font-size:0.82rem;font-weight:600;line-height:1.4;color:#e2e8f0;">AI Automation Cut Lead Response by 80%</p>
+                                <p style="font-size:0.75rem;color:#64748b;">8 min · 2.4k reads</p>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+                            <span style="font-size:1.4rem;">💰</span>
+                            <div>
+                                <p style="font-size:0.82rem;font-weight:600;line-height:1.4;color:#e2e8f0;">Achieving 8× ROAS on Google Ads</p>
+                                <p style="font-size:0.75rem;color:#64748b;">7 min · 1.9k reads</p>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+                            <span style="font-size:1.4rem;">📈</span>
+                            <div>
+                                <p style="font-size:0.82rem;font-weight:600;line-height:1.4;color:#e2e8f0;">How to Build a 90-Day Growth Roadmap</p>
+                                <p style="font-size:0.75rem;color:#64748b;">9 min · 1.7k reads</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </section>
+
+        <!-- NEWSLETTER SECTION -->
+        <section style="padding:0 1.5rem 5rem;">
+            <div class="newsletter-wrap">
+                <p style="font-size:1.8rem;margin-bottom:0.5rem;">✉️</p>
+                <h3 style="font-size:1.5rem;font-weight:800;margin-bottom:0.5rem;">Stay Ahead of the Curve</h3>
+                <p style="color:#94a3b8;font-size:0.9rem;line-height:1.6;">Marketing insights, case studies, and growth tactics — delivered every fortnight. No fluff, just value.</p>
+                <form class="nl-form" onsubmit="handleNLSubscribe(event)">
+                    <input type="email" placeholder="your@email.com" required>
+                    <button type="submit">Subscribe Free 🚀</button>
+                </form>
+                <p style="color:#475569;font-size:0.78rem;margin-top:1rem;">Join 500+ marketers and founders. Unsubscribe anytime.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <h3>Contacts:</h3>
+                <p><a href="mailto:info@hawkwingmedia.com" style="color:#fff;">info@hawkwingmedia.com</a></p>
+                <p>+91 7899442012</p>
+                <h3>Stay Connected:</h3>
+                <div class="social-media">
+                    <a href="https://www.instagram.com/hawkwingmedia/" target="_blank">
+                        <svg class="social-icon instagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M7 2C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5H7zm0 2h10c1.7 0 3 1.3 3 3v10c0 1.7-1.3 3-3 3H7c-1.7 0-3-1.3-3-3V7c0-1.7 1.3-3 3-3zm5 2a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.8-.9a1.1 1.1 0 100 2.2 1.1 1.1 0 000-2.2z"/></svg>
+                        Instagram
+                    </a>
+                    <a href="https://www.linkedin.com/company/hawkwingmedia" target="_blank">
+                        <svg class="social-icon linkedin" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M20 2H4a2 2 0 00-2 2v16c0 1.1.9 2 2 2h16a2 2 0 002-2V4a2 2 0 00-2-2zM8.3 18H5.7V9h2.6v9zM7 7.7a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM18.3 18h-2.6v-4.3c0-1.3-.5-2-1.6-2-1 0-1.5.7-1.5 2V18H10v-9h2.5v1.3c.3-.5 1.2-1.3 2.7-1.3 2 0 3.1 1.2 3.1 3.5V18z"/></svg>
+                        LinkedIn
+                    </a>
+                    <a href="https://www.youtube.com/@hawkwingmedia" target="_blank">
+                        <svg class="social-icon youtube" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M10 15l5.2-3L10 9v6zm12-6.5s0-2-.3-2.9c-.2-.8-.8-1.5-1.6-1.7C18.9 4 12 4 12 4s-6.9 0-8.1.4c-.8.2-1.4.9-1.6 1.7C2 6.5 2 8.5 2 8.5S2 10.5 2.3 11.4c.2.8.8 1.5 1.6 1.7 1.2.4 8.1.4 8.1.4s6.9 0 8.1-.4c.8-.2 1.4-.9 1.6-1.7.3-.9.3-2.9.3-2.9z"/></svg>
+                        YouTube
+                    </a>
+                </div>
+            </div>
+            <div class="footer-right">
+                <h3>Start a Conversation</h3>
+                <p>Have a project in mind? Tell us about it.</p>
+                <form action="https://formspree.io/f/xgvzjayw" method="POST">
+                    <div class="form-row">
+                        <input type="text" name="name" placeholder="Full Name" required>
+                        <input type="email" name="email" placeholder="Email" required>
+                    </div>
+                    <textarea name="message" rows="3" placeholder="What's your project all about?" required></textarea>
+                    <button type="submit">Send Now</button>
+                </form>
+            </div>
+        </div>
+    </footer>
+
+    <div class="cursor-glow" id="cursorGlow"></div>
+    <script src="index.js"></script>
+    <script>
+        // ── FILTER ──
+        const filterBtns  = document.querySelectorAll('#filterBar .filter-btn');
+        const postCards   = document.querySelectorAll('#postsGrid .post-card');
+        const featSection = document.getElementById('featuredSection');
+
+        function applyFilter(filter) {
+            filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+            const feat = featSection.querySelector('[data-cat]');
+            featSection.style.display = (filter === 'all' || feat.dataset.cat === filter) ? '' : 'none';
+            postCards.forEach(c => {
+                c.style.display = (filter === 'all' || c.dataset.cat === filter) ? '' : 'none';
+            });
+        }
+
+        filterBtns.forEach(btn => btn.addEventListener('click', () => applyFilter(btn.dataset.filter)));
+
+        function filterByTag(tag) { applyFilter(tag); window.scrollTo({top:0,behavior:'smooth'}); }
+
+        // ── SEARCH ──
+        function searchPosts(query) {
+            const q = query.toLowerCase();
+            postCards.forEach(c => {
+                const text = c.querySelector('h3').textContent.toLowerCase() + c.querySelector('p').textContent.toLowerCase();
+                c.style.display = (!q || text.includes(q)) ? '' : 'none';
+            });
+        }
+
+        // ── NEWSLETTER ──
+        function handleNLSubscribe(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.textContent = '✓ You\'re In!';
+            btn.style.background = 'linear-gradient(135deg,#34d399,#38bdf8)';
+            e.target.querySelector('input').value = '';
+            setTimeout(() => { btn.textContent = 'Subscribe Free 🚀'; btn.style.background = ''; }, 3500);
+        }
+
+        function sidebarSubscribe() {
+            const input = document.getElementById('sidebarEmail');
+            if (!input.value) return;
+            const btn = input.nextElementSibling;
+            btn.textContent = '✓ Subscribed!';
+            input.value = '';
+            setTimeout(() => { btn.textContent = 'Subscribe'; }, 3000);
+        }
+
+        // ── LOAD MORE (demo) ──
+        function loadMore() {
+            const btn = document.getElementById('loadMoreBtn');
+            btn.textContent = 'All articles loaded ✓';
+            btn.style.opacity = '0.4';
+            btn.disabled = true;
+        }
+
+        // ── SIDEBAR RESPONSIVE ──
+        function handleResize() {
+            const sidebar = document.querySelector('aside');
+            if (sidebar) sidebar.style.display = window.innerWidth < 900 ? 'none' : '';
+        }
+        window.addEventListener('resize', handleResize);
+        handleResize();
+    </script>
+</body>
+</html>
